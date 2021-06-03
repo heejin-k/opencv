@@ -50,13 +50,13 @@ vector<Point> getContours(Mat imgMask)
 			if (area > maxArea && contourPoly[i].size() == 4)
 			{
 				cout << "ENTERED LOOP 2";
-				//drawContours(imgOriginal, contourPoly, i, Scalar(255, 0, 255), 3);
+				drawContours(imgOriginal, contourPoly, i, Scalar(255, 0, 255), 3);
 				maxArea = area;
 				biggest = { contourPoly[i][0], contourPoly[i][1], contourPoly[i][2], contourPoly[i][3] };
 			}
 
 
-			//cout << contourPoly[i] << endl;
+			
 		}
 	}
 	return(biggest);
@@ -110,37 +110,20 @@ void main()
 	VideoCapture cap(0);
 	Mat imgCrop, imgWarp, imgThreshold;
 
-	string path = "C:/강의/노트.jpg";
+	string path = "C:/강의/img/노트.jpg";
 	imgOriginal = imread(path);
 
-	//setting cropFactor, for clarity
 	int cropFactor = 10;
 	Rect roi(cropFactor, cropFactor, w - (2 * cropFactor), h - (2 * cropFactor));
 
-	/*while (true)
-	{
-		cap.read(imgOriginal);*/
-
-
-		//resize(imgOriginal, imgOriginal, Size(), 0.5, 0.5);
-
-		//Preprocessing
 	imgThreshold = preProcessing(imgOriginal);
 
-
-	//Getting contours - Biggest (A4 paper)
 	initialPoints = getContours(imgThreshold);
-	/*imshow("Image", imgOriginal);
-	imshow("ImageThreshold", imgThreshold);*/
 
-	//reordering
 	finalPoints = reOrder(initialPoints);
-	//drawPoints(finalPoints, Scalar(0, 0, 255));
-
-	//warping image
+	
 	imgWarp = getWarp(imgOriginal, finalPoints, w, h);
 
-	//cropping
 	imgCrop = imgWarp(roi);
 
 	imshow("Image", imgOriginal);
@@ -148,8 +131,12 @@ void main()
 	imshow("ImageWarp", imgWarp);
 	imshow("ImageCropped", imgCrop);
 
-	//	waitKey(1);
-	//}
+	cvtColor(imgCrop, imgCrop, COLOR_BGR2GRAY, 1);
+	adaptiveThreshold(imgCrop, imgCrop, 255, ADAPTIVE_THRESH_MEAN_C, THRESH_BINARY, 9, 15);
+	GaussianBlur(imgCrop, imgCrop, Size(1, 1), 0);
+	imshow( "scanned", imgCrop);
+
+
 
 	waitKey(0);
 
